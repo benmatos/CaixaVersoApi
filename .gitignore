@@ -1,0 +1,56 @@
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docobj
+
+# Visual Studio cache/options
+.vs/
+*.rsuser
+.history/
+
+# Rider
+.idea/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Publish
+publish/
+**/publish/
+
+# ASP.NET
+wwwroot/
+
+# dotnet tool
+.tool-versions
+
+# Environment / secrets
+appsettings.Development.json
+appsettings.*.json
+!appsettings.json
+*.env
+.env
+
+# Logs
+*.log
+logs/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Test results
+TestResults/
+coverage/
+*.coverage
+*.coveragexml

@@ -1,7 +1,9 @@
 using CaixaVersoApi.Converters;
+using CaixaVersoApi.Data;
 using CaixaVersoApi.Filters;
 using CaixaVersoApi.Middlewares;
 using CaixaVersoApi.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,7 +40,19 @@ builder.Services.AddCors(options =>
 });
 
 // Dependency Injection
-builder.Services.AddSingleton<IUsuarioRepository, UsuarioRepository>();
+var persistenceType = builder.Configuration["PersistenceType"] ?? "Memory";
+
+if (persistenceType.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    builder.Services.AddDbContext<CaixaVersoDbContext>(options =>
+        options.UseSqlServer(connectionString));
+    builder.Services.AddScoped<IUsuarioRepository, UsuarioSqlRepository>();
+}
+else
+{
+    builder.Services.AddSingleton<IUsuarioRepository, UsuarioRepository>();
+}
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -55,6 +69,14 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
         options.RoutePrefix = string.Empty;
     });
+}
+
+// Apply pending migrations when using SQL Server
+if (persistenceType.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<CaixaVersoDbContext>();
+    db.Database.Migrate();
 }
 
 app.UseHttpsRedirection();
