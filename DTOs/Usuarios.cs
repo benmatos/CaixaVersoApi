@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace CaixaVersoApi.DTOs;
 
 /// <summary>
@@ -33,12 +35,18 @@ public class UsuarioDto
 public class CriarUsuarioDto
 {
     /// <summary>Nome completo do usuário. Obrigatório.</summary>
+    [Required(ErrorMessage = "O nome é obrigatório.")]
+    [StringLength(200, MinimumLength = 2, ErrorMessage = "O nome deve ter entre 2 e 200 caracteres.")]
     public string Nome { get; set; } = string.Empty;
 
     /// <summary>E-mail único do usuário. Usado como login.</summary>
+    [Required(ErrorMessage = "O e-mail é obrigatório.")]
+    [EmailAddress(ErrorMessage = "O e-mail informado não é válido.")]
     public string Email { get; set; } = string.Empty;
 
     /// <summary>Senha em texto puro. Será convertida em hash antes de ser salva.</summary>
+    [Required(ErrorMessage = "A senha é obrigatória.")]
+    [MinLength(6, ErrorMessage = "A senha deve ter no mínimo 6 caracteres.")]
     public string Senha { get; set; } = string.Empty;
 
     /// <summary>Cargo ou função do usuário. Opcional.</summary>
@@ -51,6 +59,8 @@ public class CriarUsuarioDto
 public class AtualizarUsuarioDto
 {
     /// <summary>Novo nome completo do usuário.</summary>
+    [Required(ErrorMessage = "O nome é obrigatório.")]
+    [StringLength(200, MinimumLength = 2, ErrorMessage = "O nome deve ter entre 2 e 200 caracteres.")]
     public string Nome { get; set; } = string.Empty;
 
     /// <summary>Novo cargo ou função. <c>null</c> para não alterar.</summary>
