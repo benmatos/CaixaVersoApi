@@ -36,8 +36,6 @@ wwwroot/
 
 # Environment / secrets
 appsettings.Development.json
-appsettings.*.json
-!appsettings.json
 *.env
 .env
 
