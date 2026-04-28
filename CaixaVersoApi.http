@@ -7,7 +7,7 @@ Content-Type: application/json
 
 {
     "nome": "João Silva",
-    "email": "joao.silva@exemplo.com",
+    "email": "joao.silva2@exemplo.com",
     "senha": "senha-super-secreta",
     "cargo": "Desenvolvedor"
 }
@@ -42,7 +42,7 @@ Content-Type: application/json
 
 {
     "nome": "Outro João",
-    "email": "joao.silva@exemplo.com",
-    "senha": "123",
+    "email": "joao.silva2@exemplo.com",
+    "senha": "123456",
     "cargo": "QA"
 }
