@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "dgSpecHash": "GF2M1aONfWw8D38CKnmRCK2FHy1guFvJpUsthCkUB5vZ6kichQcrUqmTFC2Og7yT0J8rgxjSr46Pee/35nWCdw==",
+  "success": true,
+  "projectFilePath": "C:\\Sistemas\\desafio_caixaverso\\src\\CaixaVersoApi\\CaixaVersoApi.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\c036713\\.nuget\\packages\\bcrypt.net-next\\4.1.0\\bcrypt.net-next.4.1.0.nupkg.sha512",
+    "C:\\Users\\c036713\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
+    "C:\\Users\\c036713\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",
+    "C:\\Users\\c036713\\.nuget\\packages\\swashbuckle.aspnetcore\\6.4.0\\swashbuckle.aspnetcore.6.4.0.nupkg.sha512",
+    "C:\\Users\\c036713\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.4.0\\swashbuckle.aspnetcore.swagger.6.4.0.nupkg.sha512",
+    "C:\\Users\\c036713\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.4.0\\swashbuckle.aspnetcore.swaggergen.6.4.0.nupkg.sha512",
+    "C:\\Users\\c036713\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\6.4.0\\swashbuckle.aspnetcore.swaggerui.6.4.0.nupkg.sha512"
+  ],
+  "logs": []
+}
