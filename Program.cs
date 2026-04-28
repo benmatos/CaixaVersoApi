@@ -79,13 +79,13 @@ if (persistenceType.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
     db.Database.Migrate();
 }
 
+// Custom CORS (must be before UseHttpsRedirection and other middleware)
+app.UseCors("FrontendPolicy");
+
 app.UseHttpsRedirection();
 
 // Custom Middleware
 app.UseMiddleware<ResponseTimeMiddleware>();
-
-// Custom CORS
-app.UseCors("FrontendPolicy");
 
 app.UseAuthorization();
 
