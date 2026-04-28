@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estrutura de Pastas — CaixaVersoApi</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      color: #333;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 1.8rem;
+      color: #1a1a2e;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background-color: #1a1a2e;
+      color: #fff;
+    }
+
+    thead th {
+      padding: 14px 20px;
+      text-align: left;
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #e8ecf0;
+      transition: background-color 0.2s;
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background-color: #f0f4ff;
+    }
+
+    tbody td {
+      padding: 14px 20px;
+      vertical-align: top;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    tbody td:first-child {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: 600;
+      color: #0d47a1;
+      white-space: nowrap;
+      width: 200px;
+    }
+
+    .badge {
+      display: inline-block;
+      background-color: #e8ecf0;
+      color: #555;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-top: 4px;
+    }
+
+    .badge.auto {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    /* ===================== FLUXOGRAMA ===================== */
+    .flowchart-section {
+      max-width: 1000px;
+      margin: 50px auto 0;
+      background-color: #fff;
+      border-radius: 14px;
+      box-shadow: 0 6px 28px rgba(0,0,0,0.12);
+      padding: 40px 50px 50px;
+    }
+
+    .flowchart-section h2 {
+      text-align: center;
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #1a1a2e;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .flowchart-section .subtitle {
+      text-align: center;
+      font-size: 1rem;
+      color: #777;
+      margin-bottom: 28px;
+    }
+
+    /* Controles */
+    .flow-controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 10px 22px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background-color: #1a1a2e;
+      color: #fff;
+    }
+
+    .btn-primary:hover { background-color: #2e2e50; }
+
+    .btn-secondary {
+      background-color: #e8ecf0;
+      color: #333;
+    }
+
+    .btn-secondary:hover { background-color: #d0d7e0; }
+
+    .btn-fullscreen {
+      background-color: #0d47a1;
+      color: #fff;
+    }
+
+    .btn-fullscreen:hover { background-color: #1565c0; }
+
+    /* Legenda de camadas */
+    .layer-legend {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      color: #555;
+      font-weight: 600;
+    }
+
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Grid do fluxo */
+    .flow-grid {
+      display: grid;
+      grid-template-columns: 1fr 64px 1fr;
+      align-items: start;
+      gap: 0;
+    }
+
+    /* Coluna request (esquerda) e response (direita) */
+    .flow-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .flow-col.right {
+      align-items: flex-end;
+    }
+
+    /* Conector central */
+    .flow-spine {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .spine-line {
+      width: 4px;
+      flex: 1;
+      min-height: 20px;
+      background: linear-gradient(to bottom, #7c9ee0, #a5d6a7);
+    }
+
+    .spine-arrow-down {
+      font-size: 1.2rem;
+      color: #7c9ee0;
+      line-height: 1;
+      margin: -2px 0;
+    }
+
+    .spine-arrow-up {
+      font-size: 1.2rem;
+      color: #66bb6a;
+      line-height: 1;
+      margin: -2px 0;
+    }
+
+    /* Cartão de cada passo */
+    .step-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background-color: #f8faff;
+      border: 2px solid #c5d3f5;
+      border-radius: 12px;
+      padding: 16px 18px;
+      width: 100%;
+      cursor: pointer;
+      transition: all 0.25s;
+      position: relative;
+    }
+
+    .step-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+      z-index: 2;
+    }
+
+    .step-card.focused {
+      transform: scale(1.04);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+      z-index: 3;
+      border-width: 3px;
+    }
+
+    .step-card.dimmed {
+      opacity: 0.25;
+      transform: scale(0.98);
+    }
+
+    /* Modo passo-a-passo: oculta cartões */
+    .step-card.hidden-step,
+    .db-node.hidden-step {
+      visibility: hidden;
+      opacity: 0;
+      height: 0;
+      padding: 0;
+      border: none;
+      overflow: hidden;
+      margin: 0;
+      transition: all 0.3s;
+    }
+
+    /* Espaçador entre cartões */
+    .step-gap {
+      height: 12px;
+    }
+
+    /* Cores por camada */
+    .step-card.layer-client  { background: #1a1a2e; border-color: #1a1a2e; }
+    .step-card.layer-client .step-title,
+    .step-card.layer-client .step-desc { color: #fff; }
+    .step-card.layer-client .step-desc { color: #c5d3f5; }
+
+    .step-card.layer-infra   { background: #fff8e1; border-color: #ffd54f; }
+    .step-card.layer-infra   .step-title { color: #e65100; }
+
+    .step-card.layer-api     { background: #e8eaf6; border-color: #7986cb; }
+    .step-card.layer-api     .step-title { color: #283593; }
+
+    .step-card.layer-domain  { background: #e3f2fd; border-color: #64b5f6; }
+    .step-card.layer-domain  .step-title { color: #0d47a1; }
+
+    .step-card.layer-data    { background: #e8f5e9; border-color: #81c784; }
+    .step-card.layer-data    .step-title { color: #1b5e20; }
+
+    /* Número do passo */
+    .step-num {
+      min-width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: rgba(0,0,0,0.12);
+      color: inherit;
+      font-weight: 800;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-card.layer-client .step-num { background: rgba(255,255,255,0.2); color: #fff; }
+    .step-card.layer-infra  .step-num { background: #ffd54f; color: #bf360c; }
+    .step-card.layer-api    .step-num { background: #7986cb; color: #fff; }
+    .step-card.layer-domain .step-num { background: #64b5f6; color: #0d47a1; }
+    .step-card.layer-data   .step-num { background: #81c784; color: #1b5e20; }
+
+    /* Ícone */
+    .step-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      line-height: 1.2;
+    }
+
+    /* Conteúdo */
+    .step-body { flex: 1; }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 1rem;
+      font-family: 'Courier New', Courier, monospace;
+      margin-bottom: 4px;
+      color: #1a1a2e;
+    }
+
+    .step-desc {
+      font-size: 0.85rem;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    /* Direção (req / resp) */
+    .step-dir {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 20px;
+      flex-shrink: 0;
+      align-self: flex-start;
+    }
+
+    .dir-req  { background: #1a237e22; color: #1a237e; }
+    .dir-resp { background: #1b5e2022; color: #1b5e20; }
+
+    /* Nó central do banco (bottom) */
+    .db-node {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      background: linear-gradient(135deg, #1b5e20, #2e7d32);
+      color: #fff;
+      border-radius: 14px;
+      padding: 20px 30px;
+      margin-top: 8px;
+      box-shadow: 0 4px 18px rgba(27,94,32,0.35);
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .db-node:hover { transform: scale(1.02); box-shadow: 0 6px 24px rgba(27,94,32,0.45); }
+    .db-node.dimmed { opacity: 0.25; }
+    .db-node.focused { transform: scale(1.04); box-shadow: 0 8px 28px rgba(27,94,32,0.5); }
+
+    .db-badge {
+      display: inline-block;
+      background-color: rgba(255,255,255,0.15);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-weight: 700;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.88rem;
+    }
+
+    .db-node .db-desc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: flex-start;
+      margin-top: 8px;
+    }
+
+    .db-step {
+      display: flex;
+      flex-direction: column;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 8px 14px;
+      min-width: 160px;
+      flex: 1;
+    }
+
+    .db-step-name {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #fff;
+      margin-bottom: 3px;
+    }
+
+    .db-step-desc {
+      font-size: 0.8rem;
+      color: #c8e6c9;
+      line-height: 1.4;
+    }
+
+    .db-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .db-desc { font-size: 0.9rem; color: #c8e6c9; margin-top: 4px; }
+
+    /* Modo fullscreen */
+    .flowchart-section:fullscreen,
+    .flowchart-section:-webkit-full-screen {
+      background: #0f0f1e;
+      padding: 40px 60px;
+      overflow-y: auto;
+    }
+
+    .flowchart-section:fullscreen h2,
+    .flowchart-section:-webkit-full-screen h2 { color: #fff; font-size: 2.2rem; }
+
+    .flowchart-section:fullscreen .subtitle,
+    .flowchart-section:-webkit-full-screen .subtitle { color: #aaa; }
+
+    .flowchart-section:fullscreen .step-card,
+    .flowchart-section:-webkit-full-screen .step-card { font-size: 1.1rem; padding: 20px 24px; }
+
+    .flowchart-section:fullscreen .step-title,
+    .flowchart-section:-webkit-full-screen .step-title { font-size: 1.2rem; }
+
+    .flowchart-section:fullscreen .step-desc,
+    .flowchart-section:-webkit-full-screen .step-desc { font-size: 1rem; }
+
+    @media (max-width: 700px) {
+      .flow-grid { grid-template-columns: 1fr; }
+      .flow-spine { display: none; }
+      .flow-col.right { align-items: flex-start; }
+      .flowchart-section { padding: 24px 16px; }
+    }
+
+    /* ===================== BLOCO INICIALIZAÇÃO ===================== */
+    .startup-section {
+      max-width: 1000px;
+      margin: 50px auto 0;
+      background-color: #fff;
+      border-radius: 14px;
+      box-shadow: 0 6px 28px rgba(0,0,0,0.12);
+      padding: 36px 50px 40px;
+    }
+
+    .startup-section h2 {
+      text-align: center;
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+      letter-spacing: -0.02em;
+    }
+
+    .startup-section .subtitle {
+      text-align: center;
+      font-size: 1rem;
+      color: #777;
+      margin-bottom: 32px;
+    }
+
+    .startup-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+      padding-left: 48px;
+    }
+
+    .startup-timeline::before {
+      content: '';
+      position: absolute;
+      left: 18px;
+      top: 12px;
+      bottom: 12px;
+      width: 4px;
+      background: linear-gradient(to bottom, #6a1b9a, #0d47a1, #00695c);
+      border-radius: 4px;
+    }
+
+    .startup-item {
+      position: relative;
+      display: flex;
+      gap: 18px;
+      padding: 16px 20px;
+      border-radius: 12px;
+      border: 2px solid transparent;
+      margin-bottom: 10px;
+      transition: all 0.2s;
+      cursor: default;
+    }
+
+    .startup-item:hover {
+      transform: translateX(4px);
+      box-shadow: 0 3px 14px rgba(0,0,0,0.1);
+    }
+
+    .startup-dot {
+      position: absolute;
+      left: -38px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 3px currentColor;
+      background-color: currentColor;
+      flex-shrink: 0;
+    }
+
+    .startup-item.s1 { background: #f3e5f5; border-color: #ce93d8; }
+    .startup-item.s1 .startup-dot { color: #8e24aa; }
+    .startup-item.s1 .startup-name { color: #6a1b9a; }
+
+    .startup-item.s2 { background: #e8eaf6; border-color: #9fa8da; }
+    .startup-item.s2 .startup-dot { color: #3949ab; }
+    .startup-item.s2 .startup-name { color: #283593; }
+
+    .startup-item.s3 { background: #e0f2f1; border-color: #80cbc4; }
+    .startup-item.s3 .startup-dot { color: #00897b; }
+    .startup-item.s3 .startup-name { color: #00695c; }
+
+    .startup-item.s4 { background: #e8f5e9; border-color: #a5d6a7; }
+    .startup-item.s4 .startup-dot { color: #43a047; }
+    .startup-item.s4 .startup-name { color: #1b5e20; }
+
+    .startup-icon { font-size: 1.8rem; flex-shrink: 0; }
+
+    .startup-name {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .startup-desc {
+      font-size: 0.88rem;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    .startup-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 2px 8px;
+      border-radius: 20px;
+      background: rgba(0,0,0,0.08);
+      color: inherit;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .startup-divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 20px 0 8px;
+      color: #aaa;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .startup-divider::before,
+    .startup-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Bloco de Inicialização -->
+  <section class="startup-section">
+    <h2>🚀 Inicialização da Aplicação</h2>
+    <p class="subtitle">O que acontece quando você executa <code>dotnet run</code> — antes de qualquer requisição chegar</p>
+
+    <div class="startup-timeline">
+
+      <div class="startup-item s1">
+        <div class="startup-dot"></div>
+        <span class="startup-icon">⚙️</span>
+        <div>
+          <div class="startup-name">Properties/launchSettings.json <span class="startup-tag">1º</span></div>
+          <div class="startup-desc">
+            O ponto de partida. Define em qual <strong>porta</strong> o servidor vai escutar
+            (ex.: <code>https://localhost:7080</code>), qual <strong>perfil</strong> usar
+            (Kestrel ou IIS Express) e variáveis de ambiente como
+            <code>ASPNETCORE_ENVIRONMENT=Development</code>.
+            <br><em>Usado apenas pelo seu computador durante o desenvolvimento — não vai para produção.</em>
+          </div>
+        </div>
+      </div>
+
+      <div class="startup-item s2">
+        <div class="startup-dot"></div>
+        <span class="startup-icon">📄</span>
+        <div>
+          <div class="startup-name">appsettings.json <span class="startup-tag">2º</span></div>
+          <div class="startup-desc">
+            Carrega as configurações da aplicação: string de conexão com o banco, origens
+            permitidas pelo CORS e nível de log. O arquivo
+            <code>appsettings.Development.json</code> sobrescreve os valores
+            quando o ambiente for Development.
+          </div>
+        </div>
+      </div>
+
+      <div class="startup-item s3">
+        <div class="startup-dot"></div>
+        <span class="startup-icon">🔌</span>
+        <div>
+          <div class="startup-name">Program.cs — registro de serviços <span class="startup-tag">3º</span></div>
+          <div class="startup-desc">
+            O arquivo <code>Program.cs</code> registra tudo que a API vai precisar:
+            Controllers, DbContext (conexão com o banco), Middlewares, Filters e CORS.
+            É como montar a equipe antes de abrir o escritório.
+          </div>
+        </div>
+      </div>
+
+      <div class="startup-item s4">
+        <div class="startup-dot"></div>
+        <span class="startup-icon">✅</span>
+        <div>
+          <div class="startup-name">Servidor pronto para receber requisições <span class="startup-tag">4º</span></div>
+          <div class="startup-desc">
+            O servidor começa a escutar na porta configurada. A partir daqui,
+            qualquer pedido HTTP do cliente percorre o fluxo descrito no diagrama abaixo.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="startup-divider">continua no fluxo de requisição ↓</div>
+  </section>
+
+  <!-- Fluxograma -->
+  <section class="flowchart-section" id="flowSection">
+    <h2>🔄 Fluxo de uma Requisição HTTP</h2>
+    <p class="subtitle">Do cliente ao banco de dados — e de volta</p>
+
+    <!-- Controles -->
+    <div class="flow-controls">
+      <button class="btn btn-primary" onclick="nextStep()">▶ Próximo passo</button>
+      <button class="btn btn-secondary" onclick="showAll()">Mostrar tudo</button>
+      <button class="btn btn-secondary" onclick="resetFlow()">↺ Reiniciar</button>
+      <button class="btn btn-fullscreen" onclick="toggleFullscreen()">⛶ Tela cheia</button>
+    </div>
+
+    <!-- Legenda -->
+    <div class="layer-legend">
+      <span class="legend-item"><span class="legend-dot" style="background:#1a1a2e"></span> Cliente</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#ffd54f"></span> Infraestrutura</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#7986cb"></span> API / Controller</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#64b5f6"></span> Domínio / DTOs</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#81c784"></span> Dados</span>
+    </div>
+
+    <!-- Grid: esquerda = REQUEST, centro = seta, direita = RESPONSE -->
+    <div class="flow-grid">
+
+      <!-- ===== COLUNA REQUEST ===== -->
+      <div class="flow-col" id="reqCol">
+
+        <div class="step-card layer-client hidden-step" data-step="1" onclick="focusStep(this)">
+          <span class="step-num">1</span>
+          <span class="step-icon">🌐</span>
+          <div class="step-body">
+            <div class="step-title">Cliente</div>
+            <div class="step-desc">O usuário clica num botão ou acessa um endereço no navegador. Isso dispara um pedido ao servidor — como ligar para um atendente e dizer: <em>"Quero a lista de usuários"</em>.</div>
+          </div>
+          <span class="step-dir dir-req">REQUEST</span>
+        </div>
+        <div class="step-gap"></div>
+
+        <div class="step-card layer-infra hidden-step" data-step="2" onclick="focusStep(this)">
+          <span class="step-num">2</span>
+          <span class="step-icon">🔧</span>
+          <div class="step-body">
+            <div class="step-title">Middlewares/</div>
+            <div class="step-desc">O pedido entra numa <em>fila de checagem</em>. O Middleware liga o cronômetro para medir quanto tempo a resposta vai demorar e passa o pedido adiante.</div>
+          </div>
+          <span class="step-dir dir-req">PIPELINE</span>
+        </div>
+        <div class="step-gap"></div>
+
+        <div class="step-card layer-infra hidden-step" data-step="3" onclick="focusStep(this)">
+          <span class="step-num">3</span>
+          <span class="step-icon">🔄</span>
+          <div class="step-body">
+            <div class="step-title">Converters/</div>
+            <div class="step-desc">O texto JSON que chegou do cliente é <em>traduzido</em> para objetos que o C# entende — como datas no formato correto. Pense num intérprete que converte o idioma do cliente para o idioma do servidor.</div>
+          </div>
+          <span class="step-dir dir-req">PIPELINE</span>
+        </div>
+        <div class="step-gap"></div>
+
+        <div class="step-card layer-api hidden-step" data-step="4" onclick="focusStep(this)">
+          <span class="step-num">4</span>
+          <span class="step-icon">🛡️</span>
+          <div class="step-body">
+            <div class="step-title">Filters/</div>
+            <div class="step-desc"><code>StandardizedResponseFilter</code> age como um <em>porteiro</em>: verifica a requisição antes de ela chegar ao Controller e já prepara o formato padrão da resposta.</div>
+          </div>
+          <span class="step-dir dir-req">ANTES</span>
+        </div>
+        <div class="step-gap"></div>
+
+        <div class="step-card layer-api hidden-step" data-step="5" onclick="focusStep(this)">
+          <span class="step-num">5</span>
+          <span class="step-icon">🎮</span>
+          <div class="step-body">
+            <div class="step-title">Controllers/</div>
+            <div class="step-desc">O <em>gerente</em> da API. Recebe o pedido, identifica o que foi solicitado (<code>GET /usuarios</code>), verifica se os dados estão corretos e aciona a equipe responsável por buscar a informação.</div>
+          </div>
+          <span class="step-dir dir-req">ACTION</span>
+        </div>
+
+      </div>
+
+      <!-- ===== ESPINHA CENTRAL ===== -->
+      <div class="flow-spine">
+        <div class="spine-line" style="height:60px"></div>
+        <div class="spine-arrow-down">▼</div>
+        <div class="spine-line" style="flex:1"></div>
+        <div class="spine-arrow-up">▲</div>
+        <div class="spine-line" style="height:60px"></div>
+      </div>
+
+      <!-- ===== COLUNA RESPONSE ===== -->
+      <div class="flow-col right" id="respCol">
+
+        <div class="step-card layer-client hidden-step" data-step="10" onclick="focusStep(this)">
+          <span class="step-num">10</span>
+          <span class="step-icon">✅</span>
+          <div class="step-body">
+            <div class="step-title">Cliente</div>
+            <div class="step-desc">O usuário recebe a resposta: os dados solicitados em formato JSON, junto com um código de status (<em>200 = tudo certo</em>) e o tempo que a operação levou.</div>
+          </div>
+          <span class="step-dir dir-resp">RESPONSE</span>
+        </div>
+        <div class="step-gap"></div>
+
+        <div class="step-card layer-infra hidden-step" data-step="9" onclick="focusStep(this)">
+          <span class="step-num">9</span>
+          <span class="step-icon">⏱️</span>
+          <div class="step-body">
+            <div class="step-title">Middlewares/</div>
+            <div class="step-desc">O Middleware para o cronômetro e <em>anota o tempo total</em> no cabeçalho da resposta — como o garçom que registra quanto tempo o pedido demorou.</div>
+          </div>
+          <span class="step-dir dir-resp">PIPELINE</span>
+        </div>
+        <div class="step-gap"></div>
+
+        <div class="step-card layer-infra hidden-step" data-step="8" onclick="focusStep(this)">
+          <span class="step-num">8</span>
+          <span class="step-icon">📤</span>
+          <div class="step-body">
+            <div class="step-title">Converters/</div>
+            <div class="step-desc">O intérprete faz o caminho inverso: converte os objetos C# de volta para texto JSON antes de enviar ao cliente — garantindo que datas e números apareçam no formato esperado.</div>
+          </div>
+          <span class="step-dir dir-resp">PIPELINE</span>
+        </div>
+        <div class="step-gap"></div>
+
+        <div class="step-card layer-api hidden-step" data-step="7" onclick="focusStep(this)">
+          <span class="step-num">7</span>
+          <span class="step-icon">📦</span>
+          <div class="step-body">
+            <div class="step-title">Filters/ + DTOs/</div>
+            <div class="step-desc">O porteiro <em>embala a resposta</em> num pacote padronizado — sempre com a mesma estrutura (sucesso/erro, dados, mensagem) — para que o cliente saiba exatamente o que esperar.</div>
+          </div>
+          <span class="step-dir dir-resp">DEPOIS</span>
+        </div>
+        <div class="step-gap"></div>
+
+        <div class="step-card layer-api hidden-step" data-step="6" onclick="focusStep(this)">
+          <span class="step-num">6</span>
+          <span class="step-icon">↩️</span>
+          <div class="step-body">
+            <div class="step-title">Controllers/</div>
+            <div class="step-desc">O gerente recebeu os dados do banco e <em>prepara a resposta</em>, escolhendo apenas as informações que o cliente pode ver (sem campos sensíveis como senhas).</div>
+          </div>
+          <span class="step-dir dir-resp">RETORNO</span>
+        </div>
+
+      </div>
+
+      <!-- ===== NÓ DO BANCO (largura total) ===== -->
+      <div class="db-node hidden-step" data-step="5.5" onclick="focusDbNode(this)">
+        <span class="db-icon">💾</span>
+        <div style="flex:1">
+          <div class="db-title">Repositories/ &rarr; Models/ &rarr; Data/ &rarr; SQL Server</div>
+          <div class="db-desc">
+            <div class="db-step">
+              <span class="db-step-name">📂 Repositories/</span>
+              <span class="db-step-desc">Decide <em>como</em> buscar os dados — encapsula todas as consultas ao banco em um só lugar.</span>
+            </div>
+            <div class="db-step">
+              <span class="db-step-name">🧩 Models/</span>
+              <span class="db-step-desc">Descreve <em>o que é</em> um usuário: quais campos existem e como eles se relacionam.</span>
+            </div>
+            <div class="db-step">
+              <span class="db-step-name">🗄️ Data/ (DbContext)</span>
+              <span class="db-step-desc">Traduz os objetos C# para SQL e <em>executa a consulta real</em> no banco de dados.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /flow-grid -->
+
+    <p style="text-align:center; margin-top:24px; font-size:0.82rem; color:#aaa;">
+      Clique em qualquer cartão para destacá-lo · Use os botões para apresentar passo a passo
+    </p>
+  </section>
+
+  <script>
+    // Ordem de revelação dos passos
+    const ORDER = [1, 2, 3, 4, 5, '5.5', 6, 7, 8, 9, 10];
+    let currentIndex = -1;
+
+    function getAllCards() {
+      return document.querySelectorAll('[data-step]');
+    }
+
+    function nextStep() {
+      currentIndex++;
+      if (currentIndex >= ORDER.length) { currentIndex = ORDER.length - 1; return; }
+      const step = ORDER[currentIndex];
+      const card = document.querySelector(`[data-step="${step}"]`);
+      if (card) {
+        card.classList.remove('hidden-step');
+        // foca o recém-revelado
+        getAllCards().forEach(c => c.classList.remove('focused', 'dimmed'));
+        card.classList.add('focused');
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function showAll() {
+      currentIndex = ORDER.length - 1;
+      getAllCards().forEach(c => {
+        c.classList.remove('hidden-step', 'focused', 'dimmed');
+      });
+    }
+
+    function resetFlow() {
+      currentIndex = -1;
+      getAllCards().forEach(c => {
+        c.classList.add('hidden-step');
+        c.classList.remove('focused', 'dimmed');
+      });
+    }
+
+    function focusStep(card) {
+      const allCards = getAllCards();
+      const isFocused = card.classList.contains('focused');
+      allCards.forEach(c => c.classList.remove('focused', 'dimmed'));
+      if (!isFocused) {
+        card.classList.add('focused');
+        allCards.forEach(c => { if (c !== card) c.classList.add('dimmed'); });
+      }
+    }
+
+    function focusDbNode(node) {
+      const allCards = getAllCards();
+      const isFocused = node.classList.contains('focused');
+      allCards.forEach(c => c.classList.remove('focused', 'dimmed'));
+      if (!isFocused) {
+        node.classList.add('focused');
+        allCards.forEach(c => { if (c !== node) c.classList.add('dimmed'); });
+      }
+    }
+
+    function toggleFullscreen() {
+      const el = document.getElementById('flowSection');
+      if (!document.fullscreenElement) {
+        el.requestFullscreen && el.requestFullscreen();
+      } else {
+        document.exitFullscreen && document.exitFullscreen();
+      }
+    }
+  </script>
+
+  <!-- Tabela de Estrutura de Pastas -->
+  <h1 style="text-align:center; margin: 50px 0 24px; font-size:1.8rem; color:#1a1a2e;">Estrutura de Pastas — CaixaVersoApi</h1>
+  <div class="container" style="margin-bottom: 50px;">
+    <table>
+      <thead>
+        <tr>
+          <th>Pasta</th>
+          <th>Função</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Controllers/</td>
+          <td>
+            Recebe as requisições HTTP e define os endpoints da API.<br />
+            <span class="badge">Ex.: UsuariosController.cs expõe as rotas de usuários.</span>
+          </td>
+        </tr>
+        <tr>
+          <td>Models/</td>
+          <td>
+            Define as entidades do domínio (tabelas do banco).<br />
+            <span class="badge">Ex.: Usuario.cs representa o modelo de dados de um usuário.</span>
+          </td>
+        </tr>
+        <tr>
+          <td>DTOs/</td>
+          <td>
+            Objetos de transferência de dados. Separa o que é exposto na API do modelo interno, evitando expor campos sensíveis.
+          </td>
+        </tr>
+        <tr>
+          <td>Data/</td>
+          <td>
+            Configuração do Entity Framework: contexto do EF, factory para migrations e a subpasta <em>Migrations/</em> com os scripts de migração do banco.
+          </td>
+        </tr>
+        <tr>
+          <td>Repositories/</td>
+          <td>
+            Camada de acesso a dados. Isola as queries do restante da aplicação.<br />
+            <span class="badge">UsuarioRepository.cs · UsuarioSqlRepository.cs</span>
+          </td>
+        </tr>
+        <tr>
+          <td>Filters/</td>
+          <td>
+            Filtros globais do pipeline do ASP.NET.<br />
+            <span class="badge">StandardizedResponseFilter.cs padroniza o formato de resposta da API.</span>
+          </td>
+        </tr>
+        <tr>
+          <td>Middlewares/</td>
+          <td>
+            Componentes intermediários do pipeline HTTP.<br />
+            <span class="badge">ResponseTimeMiddleware.cs mede e registra o tempo de resposta.</span>
+          </td>
+        </tr>
+        <tr>
+          <td>Converters/</td>
+          <td>
+            Conversores customizados de serialização JSON.<br />
+            <span class="badge">CustomDateTimeConverter.cs define como datas são serializadas/desserializadas.</span>
+          </td>
+        </tr>
+        <tr>
+          <td>Properties/</td>
+          <td>
+            Configurações de inicialização do projeto (<em>launchSettings.json</em>): perfis de execução, portas e variáveis de ambiente.
+          </td>
+        </tr>
+        <tr>
+          <td>bin/</td>
+          <td>
+            Saída compilada gerada automaticamente pelo build.<br />
+            <span class="badge auto">Gerado automaticamente — não editar</span>
+          </td>
+        </tr>
+        <tr>
+          <td>obj/</td>
+          <td>
+            Arquivos intermediários de compilação gerados pelo MSBuild/SDK.<br />
+            <span class="badge auto">Gerado automaticamente — não editar</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</body>
+</html>
