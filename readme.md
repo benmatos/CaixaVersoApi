@@ -19,9 +19,7 @@ dotnet run
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 - SQL Server LocalDB (opcional — apenas para o modo SQL Server)
 
-### Modo memória (sem banco de dados)
-
-Abra `appsettings.json` e altere:
+### Modo memória (sem banco de dados - padrão)
 
 ```json
 "PersistenceType": "Memory"
@@ -29,7 +27,8 @@ Abra `appsettings.json` e altere:
 
 ### Modo SQL Server
 
-Mantenha `"PersistenceType": "SqlServer"` em `appsettings.json` e certifique-se de que a string de conexão aponta para uma instância válida:
+Abra `appsettings.json` e altere:
+"PersistenceType": "SqlServer" e certifique-se de que a string de conexão aponta para uma instância válida:
 
 ```json
 "ConnectionStrings": {
