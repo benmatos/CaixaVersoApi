@@ -5,17 +5,31 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CaixaVersoApi.Controllers;
 
+/// <summary>
+/// Controller responsável pelo gerenciamento de usuários.
+/// Expõe endpoints REST para criar, listar, buscar, atualizar e desativar usuários.
+/// </summary>
 [ApiController]
 [Route("api/v1/[controller]")] // Custom routing (versioning)
 public class UsuariosController : ControllerBase
 {
     private readonly IUsuarioRepository _usuarioRepository;
 
+    /// <summary>
+    /// Injeta o repositório de usuários via injeção de dependência.
+    /// </summary>
+    /// <param name="usuarioRepository">Implementação do repositório de usuários.</param>
     public UsuariosController(IUsuarioRepository usuarioRepository)
     {
         _usuarioRepository = usuarioRepository;
     }
 
+    /// <summary>
+    /// Cadastra um novo usuário no sistema.
+    /// Verifica se o e-mail já está em uso antes de criar.
+    /// </summary>
+    /// <param name="dto">Dados necessários para criar o usuário.</param>
+    /// <returns>Status 201 com o usuário criado, ou 409 se o e-mail já existir.</returns>
     [HttpPost]
     public async Task<IActionResult> CriarUsuario([FromBody] CriarUsuarioDto dto)
     {
@@ -43,6 +57,10 @@ public class UsuariosController : ControllerBase
         return CreatedAtAction(nameof(BuscarPorId), new { id = criado.Id }, responseDto);
     }
 
+    /// <summary>
+    /// Retorna a lista completa de usuários cadastrados.
+    /// </summary>
+    /// <returns>Status 200 com a lista de usuários.</returns>
     [HttpGet]
     public async Task<IActionResult> ListarUsuarios()
     {
@@ -51,6 +69,11 @@ public class UsuariosController : ControllerBase
         return Ok(dtos);
     }
 
+    /// <summary>
+    /// Busca um usuário específico pelo seu identificador único.
+    /// </summary>
+    /// <param name="id">GUID do usuário.</param>
+    /// <returns>Status 200 com o usuário, ou 404 se não encontrado.</returns>
     [HttpGet("{id:guid}")] // Route constraints
     public async Task<IActionResult> BuscarPorId(Guid id)
     {
@@ -63,6 +86,12 @@ public class UsuariosController : ControllerBase
         return Ok(MapearParaDto(usuario));
     }
 
+    /// <summary>
+    /// Atualiza o nome e o cargo de um usuário existente.
+    /// </summary>
+    /// <param name="id">GUID do usuário a ser atualizado.</param>
+    /// <param name="dto">Novos dados do usuário.</param>
+    /// <returns>Status 200 com o usuário atualizado, ou 404 se não encontrado.</returns>
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> AtualizarUsuario(Guid id, [FromBody] AtualizarUsuarioDto dto)
     {
@@ -81,6 +110,11 @@ public class UsuariosController : ControllerBase
         return Ok(MapearParaDto(usuario));
     }
 
+    /// <summary>
+    /// Desativa um usuário (exclusão lógica). O registro não é removido do banco.
+    /// </summary>
+    /// <param name="id">GUID do usuário a ser desativado.</param>
+    /// <returns>Status 200 com mensagem de confirmação, ou 404 se não encontrado.</returns>
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DesativarUsuario(Guid id)
     {

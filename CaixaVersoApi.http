@@ -1,6 +1,48 @@
-@CaixaVersoApi_HostAddress = http://localhost:5013
+@baseUrl = http://localhost:5013/api/v1
 
-GET {{CaixaVersoApi_HostAddress}}/weatherforecast/
+### 1. Criar um novo usuário
+# @name criarUsuario
+POST {{baseUrl}}/usuarios
+Content-Type: application/json
+
+{
+    "nome": "João Silva",
+    "email": "joao.silva@exemplo.com",
+    "senha": "senha-super-secreta",
+    "cargo": "Desenvolvedor"
+}
+
+### Armazenar o ID do usuário criado
+@userId = {{criarUsuario.response.body.dados_resposta.id}}
+
+### 2. Listar todos os usuários
+GET {{baseUrl}}/usuarios
 Accept: application/json
 
-###
+### 3. Buscar usuário por ID
+GET {{baseUrl}}/usuarios/{{userId}}
+Accept: application/json
+
+### 4. Atualizar usuário
+PUT {{baseUrl}}/usuarios/{{userId}}
+Content-Type: application/json
+
+{
+    "nome": "João Silva Editado",
+    "cargo": "Arquiteto de Software"
+}
+
+### 5. Desativar usuário
+DELETE {{baseUrl}}/usuarios/{{userId}}
+Accept: application/json
+
+### 6. Tentar criar usuário com email já existente
+POST {{baseUrl}}/usuarios
+Content-Type: application/json
+
+{
+    "nome": "Outro João",
+    "email": "joao.silva@exemplo.com",
+    "senha": "123",
+    "cargo": "QA"
+}
