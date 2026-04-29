@@ -3,8 +3,9 @@ using CaixaVersoApi.Data;
 using CaixaVersoApi.Filters;
 using CaixaVersoApi.Middlewares;
 using CaixaVersoApi.Repositories;
-using Microsoft.EntityFrameworkCore;
-
+using CaixaVersoApi.Services;
+using CaixaVersoApi.Models;
+using Microsoft.EntityFrameworkCore;        
 // Ponto de entrada da aplicação.
 // O WebApplication.CreateBuilder configura o host, lê o appsettings.json
 // e prepara o contêiner de injeção de dependência.
@@ -75,7 +76,12 @@ else
     // Singleton: uma única instância compartilhada durante toda a vida da aplicação
     // Adequado para o repositório em memória (dicionário estático)
     builder.Services.AddSingleton<IUsuarioRepository, UsuarioRepository>();
+    builder.Services.AddSingleton<UsuarioService>();
+    builder.Services.AddSingleton<Dictionary<string, Usuario>>();
 }
+
+// CriptografiaService é necessário em ambos os modos (Memory e SqlServer)
+builder.Services.AddSingleton<CriptografiaService>();
 
 // ─────────────────────────────────────────────
 // SWAGGER — DOCUMENTAÇÃO AUTOMÁTICA DA API

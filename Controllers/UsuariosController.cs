@@ -1,8 +1,8 @@
 using CaixaVersoApi.DTOs;
 using CaixaVersoApi.Models;
 using CaixaVersoApi.Repositories;
+using CaixaVersoApi.Services;
 using Microsoft.AspNetCore.Mvc;
-
 namespace CaixaVersoApi.Controllers;
 
 /// <summary>
@@ -14,14 +14,15 @@ namespace CaixaVersoApi.Controllers;
 public class UsuariosController : ControllerBase
 {
     private readonly IUsuarioRepository _usuarioRepository;
+    private readonly CriptografiaService _cripto;
 
     /// <summary>
-    /// Injeta o repositório de usuários via injeção de dependência.
+    /// Injeta o repositório de usuários e o serviço de criptografia via injeção de dependência.
     /// </summary>
-    /// <param name="usuarioRepository">Implementação do repositório de usuários.</param>
-    public UsuariosController(IUsuarioRepository usuarioRepository)
+    public UsuariosController(IUsuarioRepository usuarioRepository, CriptografiaService cripto)
     {
         _usuarioRepository = usuarioRepository;
+        _cripto = cripto;
     }
 
     /// <summary>
@@ -47,7 +48,8 @@ public class UsuariosController : ControllerBase
             SenhaHash = BCrypt.Net.BCrypt.HashPassword(dto.Senha),
             Ativo = true,
             CriadoEm = DateTime.Now,
-            Cargo = dto.Cargo
+            Cargo = dto.Cargo,
+            DataNascimentoCriptografada = _cripto.Criptografar(dto.DataNascimento.ToString("yyyy-MM-dd"))
         };
 
         var criado = await _usuarioRepository.CriarAsync(novoUsuario);
@@ -133,8 +135,9 @@ public class UsuariosController : ControllerBase
         return Ok(new { mensagem = "Usuário desativado com sucesso." });
     }
 
-    private static UsuarioDto MapearParaDto(Usuario usuario)
+    private UsuarioDto MapearParaDto(Usuario usuario)
     {
+        var dataTxt = _cripto.Descriptografar(usuario.DataNascimentoCriptografada);
         return new UsuarioDto
         {
             Id = usuario.Id,
@@ -143,7 +146,8 @@ public class UsuariosController : ControllerBase
             Ativo = usuario.Ativo,
             CriadoEm = usuario.CriadoEm,
             AtualizadoEm = usuario.AtualizadoEm,
-            Cargo = usuario.Cargo
+            Cargo = usuario.Cargo,
+            DataNascimento = DateTime.Parse(dataTxt)
         };
     }
 }

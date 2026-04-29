@@ -28,4 +28,7 @@ public class Usuario
 
     /// <summary>Cargo ou função do usuário na organização.</summary>
     public string? Cargo { get; set; }
+
+    /// <summary>Data de nascimento do usuário, armazenada de forma criptografada.</summary>
+    public string DataNascimentoCriptografada { get; set; } = "";
 }

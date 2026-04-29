@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-API REST desenvolvida em **.NET 8** para gerenciamento de usuários. Permite cadastrar, listar, buscar, atualizar e desativar usuários, com proteção de senha, respostas padronizadas e suporte a dois modos de persistência.
+API REST desenvolvida em **.NET 8** para gerenciamento de usuários. Permite cadastrar, listar, buscar, atualizar e desativar usuários, com proteção de senha, criptografia AES-256 da data de nascimento, respostas padronizadas e suporte a dois modos de persistência.
 
 ---
 
@@ -53,7 +53,8 @@ CaixaVersoApi/
 ├── Data/             → DbContext e factory do Entity Framework Core
 ├── Filters/          → Filtro de padronização de resposta
 ├── Middlewares/      → Middleware de log de tempo de resposta
-├── Converters/       → Conversor de datas para o formato dd/MM/yyyy HH:mm:ss
+├── Converters/       → Conversor de datas (entrada flexível, saída dd/MM/yyyy HH:mm:ss)
+├── Services/         → CriptografiaService (AES-256) e UsuarioService
 └── Program.cs        → Composição root da aplicação
 ```
 
@@ -80,9 +81,12 @@ POST /api/v1/usuarios
   "nome": "João Silva",
   "email": "joao@exemplo.com",
   "senha": "senha123",
-  "cargo": "Analista"
+  "cargo": "Analista",
+  "data_nascimento": "15/06/1990"
 }
 ```
+
+> O campo `data_nascimento` aceita os formatos: `dd/MM/yyyy`, `dd/MM/yyyy HH:mm:ss`, `yyyy-MM-dd` e ISO 8601 (`2026-04-29T02:05:28.868Z`).
 
 **Response (201):**
 ```json
@@ -93,7 +97,8 @@ POST /api/v1/usuarios
     "email": "joao@exemplo.com",
     "ativo": true,
     "criado_em": "28/04/2026 10:30:00",
-    "cargo": "Analista"
+    "cargo": "Analista",
+    "data_nascimento": "15/06/1990 00:00:00"
   },
   "timestamp_resposta": "28/04/2026 10:30:00",
   "tempo_da_resposta": "45 ms"
@@ -107,6 +112,29 @@ POST /api/v1/usuarios
 ### Proteção de senha
 
 A senha é convertida com **BCrypt** (`BCrypt.Net-Next`) antes de ser salva. O hash inclui salt aleatório, tornando cada hash único mesmo para senhas iguais. O campo `SenhaHash` nunca é exposto nas respostas da API.
+
+### Criptografia da data de nascimento
+
+A data de nascimento é criptografada com **AES-256** antes de ser persistida, por meio do `CriptografiaService`. A chave e o IV são lidos do `appsettings.json` (seção `Criptografia`) como strings Base64:
+
+```json
+"Criptografia": {
+  "KeyBase64": "<chave AES-256 de 32 bytes em Base64>",
+  "IvBase64": "<IV de 16 bytes em Base64>"
+}
+```
+
+> **Segurança:** em produção, mova esses valores para variáveis de ambiente ou `dotnet user-secrets`. Nunca commite chaves reais no repositório.
+
+Para gerar novos valores:
+```powershell
+$aes = [System.Security.Cryptography.Aes]::Create()
+$aes.GenerateKey(); $aes.GenerateIV()
+Write-Host "KeyBase64: $([Convert]::ToBase64String($aes.Key))"
+Write-Host "IvBase64:  $([Convert]::ToBase64String($aes.IV))"
+```
+
+Na resposta da API, a data é **descriptografada** e retornada no formato `dd/MM/yyyy HH:mm:ss`.
 
 ### Middleware — `ResponseTimeMiddleware`
 
@@ -129,9 +157,10 @@ Filtro de ação global (`IAsyncActionFilter`) que envolve qualquer `ObjectResul
 
 Configurada globalmente em `Program.cs`:
 
-- **snake_case** para todos os campos (ex.: `criado_em`, `senha_hash`)
+- **snake_case** para todos os campos (ex.: `criado_em`, `data_nascimento`)
 - **Nulos ignorados**: campos `null` não aparecem na resposta
-- **Datas** no formato `dd/MM/yyyy HH:mm:ss` via `CustomDateTimeConverter`
+- **Datas na entrada**: aceita `dd/MM/yyyy`, `dd/MM/yyyy HH:mm:ss`, `yyyy-MM-dd`, `yyyy-MM-ddTHH:mm:ss` e ISO 8601 completo (com milissegundos e `Z`)
+- **Datas na saída**: sempre `dd/MM/yyyy HH:mm:ss` via `CustomDateTimeConverter`
 
 ### CORS
 
@@ -181,6 +210,7 @@ O endpoint `DELETE` não remove o registro do banco. Ele apenas define `Ativo = 
        │
        ▼
 [ Controller: UsuariosController ]
+       │  usa CriptografiaService (AES-256)
        │  (via IActionFilter)
        ▼
 [ Filtro: StandardizedResponseFilter ]

@@ -636,8 +636,9 @@
           <div class="startup-name">appsettings.json <span class="startup-tag">2º</span></div>
           <div class="startup-desc">
             Carrega as configurações da aplicação: string de conexão com o banco, origens
-            permitidas pelo CORS e nível de log. O arquivo
-            <code>appsettings.Development.json</code> sobrescreve os valores
+            permitidas pelo CORS, nível de log e a seção <code>Criptografia</code>
+            (chave AES-256 e IV em Base64 usados pelo <code>CriptografiaService</code>).
+            O arquivo <code>appsettings.Development.json</code> sobrescreve os valores
             quando o ambiente for Development.
           </div>
         </div>
@@ -651,6 +652,8 @@
           <div class="startup-desc">
             O arquivo <code>Program.cs</code> registra tudo que a API vai precisar:
             Controllers, DbContext (conexão com o banco), Middlewares, Filters e CORS.
+            O <code>CriptografiaService</code> também é registrado aqui como <em>Singleton</em>,
+            independente do modo de persistência escolhido.
             É como montar a equipe antes de abrir o escritório.
           </div>
         </div>
@@ -728,7 +731,7 @@
           <span class="step-icon">🔄</span>
           <div class="step-body">
             <div class="step-title">Converters/</div>
-            <div class="step-desc">O texto JSON que chegou do cliente é <em>traduzido</em> para objetos que o C# entende — como datas no formato correto. Pense num intérprete que converte o idioma do cliente para o idioma do servidor.</div>
+            <div class="step-desc">O texto JSON que chegou do cliente é <em>traduzido</em> para objetos que o C# entende. Aceita datas em vários formatos (<code>dd/MM/yyyy</code>, ISO 8601 com <code>Z</code>, etc.) e converte para <code>DateTime</code>. Pense num intérprete que normaliza o idioma do cliente.</div>
           </div>
           <span class="step-dir dir-req">PIPELINE</span>
         </div>
@@ -750,7 +753,7 @@
           <span class="step-icon">🎮</span>
           <div class="step-body">
             <div class="step-title">Controllers/</div>
-            <div class="step-desc">O <em>gerente</em> da API. Recebe o pedido, identifica o que foi solicitado (<code>GET /usuarios</code>), verifica se os dados estão corretos e aciona a equipe responsável por buscar a informação.</div>
+            <div class="step-desc">O <em>gerente</em> da API. Recebe o pedido, identifica o que foi solicitado (<code>GET /usuarios</code>), verifica se os dados estão corretos e aciona a equipe. Em operações de escrita, chama o <code>CriptografiaService</code> para <strong>criptografar a data de nascimento</strong> antes de persistir.</div>
           </div>
           <span class="step-dir dir-req">ACTION</span>
         </div>
@@ -817,8 +820,8 @@
           <span class="step-num">6</span>
           <span class="step-icon">↩️</span>
           <div class="step-body">
-            <div class="step-title">Controllers/</div>
-            <div class="step-desc">O gerente recebeu os dados do banco e <em>prepara a resposta</em>, escolhendo apenas as informações que o cliente pode ver (sem campos sensíveis como senhas).</div>
+            <div class="step-title">Controllers/ + Services/</div>
+            <div class="step-desc">O gerente recebeu os dados do banco e <em>prepara a resposta</em>. O <code>CriptografiaService</code> é chamado para <strong>descriptografar a data de nascimento</strong> antes de montar o DTO final, que nunca expõe campos sensíveis como senha.</div>
           </div>
           <span class="step-dir dir-resp">RETORNO</span>
         </div>
@@ -950,13 +953,20 @@
         <tr>
           <td>DTOs/</td>
           <td>
-            Objetos de transferência de dados. Separa o que é exposto na API do modelo interno, evitando expor campos sensíveis.
+            Objetos de transferência de dados. Separa o que é exposto na API do modelo interno, evitando expor campos sensíveis como <code>SenhaHash</code> e <code>DataNascimentoCriptografada</code>.
           </td>
         </tr>
         <tr>
           <td>Data/</td>
           <td>
             Configuração do Entity Framework: contexto do EF, factory para migrations e a subpasta <em>Migrations/</em> com os scripts de migração do banco.
+          </td>
+        </tr>
+        <tr>
+          <td>Services/</td>
+          <td>
+            Serviços com lógica de negócio reutilizável.<br />
+            <span class="badge">CriptografiaService.cs — criptografa e descriptografa a data de nascimento com AES-256.</span>
           </td>
         </tr>
         <tr>
@@ -984,7 +994,7 @@
           <td>Converters/</td>
           <td>
             Conversores customizados de serialização JSON.<br />
-            <span class="badge">CustomDateTimeConverter.cs define como datas são serializadas/desserializadas.</span>
+            <span class="badge">CustomDateTimeConverter.cs aceita datas em vários formatos (<code>dd/MM/yyyy</code>, <code>yyyy-MM-dd</code>, ISO 8601 com milissegundos/<code>Z</code>) e serializa sempre em <code>dd/MM/yyyy HH:mm:ss</code>.</span>
           </td>
         </tr>
         <tr>

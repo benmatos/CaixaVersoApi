@@ -5,42 +5,61 @@ namespace CaixaVersoApi.Converters;
 
 public class CustomDateTimeConverter : JsonConverter<DateTime>
 {
-    private const string Format = "dd/MM/yyyy HH:mm:ss";
+    private static readonly string[] Formats =
+    [
+        "dd/MM/yyyy HH:mm:ss",
+        "dd/MM/yyyy",
+        "yyyy-MM-ddTHH:mm:ss",
+        "yyyy-MM-dd"
+    ];
+
+    private const string OutputFormat = "dd/MM/yyyy HH:mm:ss";
 
     public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return DateTime.ParseExact(reader.GetString()!, Format, null);
+        var value = reader.GetString()!;
+        if (DateTime.TryParseExact(value, Formats, null, System.Globalization.DateTimeStyles.None, out var result))
+            return result;
+        if (DateTime.TryParse(value, null, System.Globalization.DateTimeStyles.RoundtripKind, out result))
+            return result.ToLocalTime();
+        throw new JsonException($"Formato de data inválido: '{value}'. Formatos aceitos: dd/MM/yyyy HH:mm:ss, dd/MM/yyyy, yyyy-MM-dd ou ISO 8601.");
     }
 
     public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
     {
-        writer.WriteStringValue(value.ToString(Format));
+        writer.WriteStringValue(value.ToString(OutputFormat));
     }
 }
 
 public class CustomNullableDateTimeConverter : JsonConverter<DateTime?>
 {
-    private const string Format = "dd/MM/yyyy HH:mm:ss";
+    private static readonly string[] Formats =
+    [
+        "dd/MM/yyyy HH:mm:ss",
+        "dd/MM/yyyy",
+        "yyyy-MM-ddTHH:mm:ss",
+        "yyyy-MM-dd"
+    ];
+
+    private const string OutputFormat = "dd/MM/yyyy HH:mm:ss";
 
     public override DateTime? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var value = reader.GetString();
         if (string.IsNullOrEmpty(value))
-        {
             return null;
-        }
-        return DateTime.ParseExact(value, Format, null);
+        if (DateTime.TryParseExact(value, Formats, null, System.Globalization.DateTimeStyles.None, out var result))
+            return result;
+        if (DateTime.TryParse(value, null, System.Globalization.DateTimeStyles.RoundtripKind, out result))
+            return result.ToLocalTime();
+        throw new JsonException($"Formato de data inválido: '{value}'. Formatos aceitos: dd/MM/yyyy HH:mm:ss, dd/MM/yyyy, yyyy-MM-dd ou ISO 8601.");
     }
 
     public override void Write(Utf8JsonWriter writer, DateTime? value, JsonSerializerOptions options)
     {
         if (value.HasValue)
-        {
-            writer.WriteStringValue(value.Value.ToString(Format));
-        }
+            writer.WriteStringValue(value.Value.ToString(OutputFormat));
         else
-        {
             writer.WriteNullValue();
-        }
     }
 }

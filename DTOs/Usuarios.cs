@@ -27,6 +27,12 @@ public class UsuarioDto
 
     /// <summary>Cargo ou função do usuário.</summary>
     public string? Cargo { get; set; }
+    
+    /// <summary>
+    /// Data de nascimento do usuário, descriptografada para exibição. Nunca armazene ou transmita a data de nascimento em texto puro sem criptografia.
+    /// Em um cenário real, considere não expor a data de nascimento ou usar uma representação que não revele a data exata, como a idade ou o ano de nascimento, para proteger a privacidade do usuário.
+    /// </summary>
+    public DateTime DataNascimento { get; set; }
 }
 
 /// <summary>
@@ -51,6 +57,10 @@ public class CriarUsuarioDto
 
     /// <summary>Cargo ou função do usuário. Opcional.</summary>
     public string? Cargo { get; set; }
+
+    /// <summary>Data de nascimento do usuário.</summary>
+    [Required(ErrorMessage = "A data de nascimento é obrigatória.")]
+    public DateTime DataNascimento { get; set; }
 }
 
 /// <summary>
@@ -65,4 +75,7 @@ public class AtualizarUsuarioDto
 
     /// <summary>Novo cargo ou função. <c>null</c> para não alterar.</summary>
     public string? Cargo { get; set; }
+
+    /// <summary>Nova data de nascimento. <c>null</c> para não alterar.</summary>
+    public DateTime? DataNascimento { get; set; }
 }
