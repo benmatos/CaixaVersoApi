@@ -115,7 +115,7 @@ A senha é convertida com **BCrypt** (`BCrypt.Net-Next`) antes de ser salva. O h
 
 ### Criptografia da data de nascimento
 
-A data de nascimento é criptografada com **AES-256** antes de ser persistida, por meio do `CriptografiaService`. A chave e o IV são lidos do `appsettings.json` (seção `Criptografia`) como strings Base64:
+A data de nascimento é criptografada com **AES-256** antes de ser persistida, por meio do `CriptografiaService`. A chave e o IV (IV introduz aleatoriedade no processo de cifragem) são lidos do `appsettings.json` (seção `Criptografia`) como strings Base64:
 
 ```json
 "Criptografia": {
