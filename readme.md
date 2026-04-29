@@ -200,6 +200,92 @@ O endpoint `DELETE` não remove o registro do banco. Ele apenas define `Ativo = 
 
 ---
 
+## Descrição das Classes
+
+### Controllers
+
+#### `UsuariosController`
+Ponto de entrada HTTP da aplicação. Recebe as requisições REST, delega a lógica ao repositório e ao serviço de criptografia, e devolve as respostas formatadas. Cada método corresponde a um endpoint (`POST`, `GET`, `PUT`, `DELETE`). Usa injeção de dependência para receber `IUsuarioRepository` e `CriptografiaService`, sem acoplamento com implementações concretas.
+
+---
+
+### DTOs
+
+#### `UsuarioDto`
+Contrato de **saída** da API. Representa os dados do usuário que são retornados ao cliente. Nunca expõe o campo `SenhaHash`, garantindo que a senha nunca vaze pela resposta.
+
+#### `CriarUsuarioDto`
+Contrato de **entrada** para criação de um novo usuário. Contém validações via Data Annotations (`[Required]`, `[EmailAddress]`, `[MinLength]`) que são verificadas automaticamente pelo pipeline do ASP.NET Core antes de o controller ser executado.
+
+#### `AtualizarUsuarioDto`
+Contrato de **entrada** para atualização parcial de um usuário. Restringe os campos que o cliente pode modificar (nome, cargo e data de nascimento), impedindo alterações de campos sensíveis como e-mail ou senha via esse endpoint.
+
+---
+
+### Models
+
+#### `Usuario`
+Entidade de domínio que representa um usuário no sistema. É a classe mapeada pelo Entity Framework Core para a tabela do banco de dados. Armazena a senha como hash (`SenhaHash`) e a data de nascimento de forma criptografada (`DataNascimentoCriptografada`), nunca em texto puro.
+
+---
+
+### Repositories
+
+#### `IUsuarioRepository`
+Interface que define o contrato de acesso a dados. Permite que o restante do sistema (controller, serviços) trabalhe com qualquer fonte de dados sem depender de uma implementação específica — princípio da inversão de dependência (DIP). Define as operações: `CriarAsync`, `ListarAsync`, `BuscarPorIdAsync`, `BuscarPorEmailAsync` e `AtualizarAsync`.
+
+#### `UsuarioRepository`
+Implementação em memória de `IUsuarioRepository`. Usa um `Dictionary<Guid, Usuario>` como armazenamento. Ideal para desenvolvimento, testes e demonstrações sem necessidade de banco de dados. Registrado como `Singleton` no contêiner de DI.
+
+#### `UsuarioSqlRepository`
+Implementação de `IUsuarioRepository` que persiste os dados no SQL Server via Entity Framework Core. Usa o `CaixaVersoDbContext` para executar as operações no banco. Registrado como `Scoped` no contêiner de DI para seguir o ciclo de vida correto do `DbContext`.
+
+---
+
+### Data
+
+#### `CaixaVersoDbContext`
+Contexto do Entity Framework Core. Define o `DbSet<Usuario>` e configura o mapeamento da entidade no método `OnModelCreating` (chave primária, tamanhos máximos de campos, índice único para e-mail). É a ponte entre os objetos C# e as tabelas do banco de dados.
+
+#### `CaixaVersoDbContextFactory`
+Fábrica de design-time usada exclusivamente pelas ferramentas do EF Core (`dotnet ef migrations add`, `dotnet ef database update`). Permite que os comandos de migração funcionem sem precisar iniciar a aplicação completa.
+
+---
+
+### Filters
+
+#### `StandardizedResponseFilter`
+Filtro de ação global (`IAsyncActionFilter`) que intercepta qualquer `ObjectResult` retornado pelos controllers e o envolve no envelope padronizado com `dados_resposta`, `timestamp_resposta` e `tempo_da_resposta`. Garante que **todas** as respostas sigam o mesmo formato, sem que cada controller precise fazer isso manualmente.
+
+---
+
+### Middlewares
+
+#### `ResponseTimeMiddleware`
+Middleware customizado que mede o tempo total de cada requisição HTTP usando um `Stopwatch`. Ao final da requisição, registra no log da aplicação a informação de tempo no formato `Request {Método} {Rota} took {N} ms`. É executado antes de qualquer controller, medindo o tempo de toda a pipeline.
+
+---
+
+### Converters
+
+#### `CustomDateTimeConverter`
+Conversor de datas para o serializador `System.Text.Json`. Na **leitura** (entrada), aceita múltiplos formatos (`dd/MM/yyyy`, `dd/MM/yyyy HH:mm:ss`, `yyyy-MM-dd`, ISO 8601), tornando a API tolerante a diferentes clientes. Na **escrita** (saída), normaliza todas as datas para `dd/MM/yyyy HH:mm:ss`, garantindo consistência nas respostas.
+
+#### `CustomNullableDateTimeConverter`
+Variante de `CustomDateTimeConverter` para campos `DateTime?` (nullable). Aplica a mesma lógica de leitura e escrita, mas aceita valores nulos sem lançar exceção.
+
+---
+
+### Services
+
+#### `CriptografiaService`
+Serviço responsável por criptografar e descriptografar dados sensíveis usando **AES-256**. A chave (`KeyBase64`) e o vetor de inicialização (`IvBase64`) são lidos do `appsettings.json` via `IConfiguration`. Usado pelo controller para proteger a data de nascimento antes de persistir e para restaurá-la ao retornar os dados.
+
+#### `UsuarioService`
+Serviço auxiliar que encapsula a lógica de criação e busca de usuários com suporte à criptografia. Combina o dicionário de dados em memória com o `CriptografiaService` para criar e mapear entidades com data de nascimento protegida.
+
+---
+
 ## Diagrama de Camadas
 
 ```
